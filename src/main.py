@@ -1,5 +1,6 @@
 import os
 import time
+import subprocess
 
 def clear_screen():
     os.system('clear')
@@ -12,14 +13,22 @@ def main():
         print("Establishing server...")
         time.sleep(1)
         #Run server.py
+        procces_result = subprocess.run(["python3", "server.py"], capture_output=True, text=True)
     elif response== 'c':
         print("Setting up client...")
         time.sleep(1)
         #Run client.py
+        procces_result = subprocess.run(["python3", "server.py"], capture_output=True, text=True)
     else:
         print("Invalid option")
         time.sleep(1)
         main()
+    if procces_result.returncode == 0:
+        print("Script executed succesfully!")
+        print("Output: ", procces_result.stdout);
+    else:
+        print("Script execution failed!")
+        print("Error:", procces_result.stderr)
 
 
 if __name__ == "__main__":
