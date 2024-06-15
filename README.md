@@ -1,4 +1,4 @@
-#CrypticTunnel - Cryptographic Secured Transfer Tunnel
+# CrypticTunnel - Cryptographic Secured Transfer Tunnel
 
 A terminal-based application where two people can securely connect and chat with each other.
 The communication will be secured using a TLS-like protocol implemented with C++ for the cryptographic operations
