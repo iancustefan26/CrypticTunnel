@@ -4,6 +4,7 @@ from usable import clear_screen
 from usable import is_server_running
 import time
 
+dont = True
 
 def connect_to_server(server_addr, server_port, name):
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,12 +22,14 @@ def connect_to_server(server_addr, server_port, name):
     while True:
         client_message = name + ": " + input(f"{name}: ")
         if client_message[len(name) + 2:] == "/quit":
-            client_sock.sendall("disconnected".encode('utf-8'))
+            if dont:
+                client_sock.sendall(f"{name} has disconnected".encode('utf-8'))
             break
         try:
             client_sock.sendall(client_message.encode('utf-8'))
         except:
             print("Host has disconnected; try /quit")
+            dont = False
     client_sock.close()
     print("Disconnected from the server")
 

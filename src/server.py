@@ -1,33 +1,26 @@
 import socket
 import threading
+from usable import clear_screen
+import curses
+import keyboard
+from usable import listen_for_key
 
 def listen_client(client_sock, client_addr, name):
+    clear_screen()
     print(f"Accepted request from Client with IP : {client_addr}")
+    client_name = client_sock.recv(100).decode('utf-8')
+    print(f"{name} has joined.")
     try:
-        client_name = client_sock.recv(1024).decode('utf-8')
-        print(f"{client_name} has joined the chat.")
-        #client_sock.sendall(name.encode('utf-8'))
-    except ConnectionResetError:
-            print(f"Connection from {client_addr} has been reset.")
-    
-    while True:
-        #your_message = input(f"{name}: ")
-
-        try:
-            # Receive data from the client
+        while True:
             data = client_sock.recv(1024)
             if not data:
-                continue
-            message = data.decode('utf-8')
-            if(message == "disconnected"):
-                print(f"{client_name} has left the chat.")
-                continue
-            print(f"{message}")
-        except ConnectionResetError:
-            print(f"{client_name} has left the chat.")
-            break
-
-    client_sock.close()
+                print("Client has disconnected")
+                break
+            print(f"{data.decode('utf-8')}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        client_sock.close()
              
     
 
@@ -38,10 +31,10 @@ def start_server(name):
     server_socket.bind((host, port))
     server_socket.listen(10)
     print(f"Server running on IP: {host} -- PORT: {port} is listening for requests...")
-
     while True:
         client_sock, client_addr = server_socket.accept()
-        threading.Thread(target=listen_client, args=(client_sock, client_addr, name)).start()
+        listen_client(client_sock, client_addr, name)   
+        
 
 
 if __name__ == "__main__":
