@@ -3,6 +3,8 @@ import threading
 from usable import clear_screen
 from usable import is_server_running
 import time
+import os
+from file_transfer import send_file
 
 dont = True
 
@@ -25,6 +27,14 @@ def connect_to_server(server_addr, server_port, name):
             if dont:
                 client_sock.sendall(f"{name} has disconnected".encode('utf-8'))
             break
+        if client_message[len(name) + 2 : len(name) + 7] == "/send":
+            file_path = client_message[len(name) + 8:]
+            print(file_path)
+            if os.path.exists(file_path):
+                print("Sending file to the server...")
+                send_file(file_path)
+            else:
+                print(f"{file_path} : No such file or directory.")
         try:
             client_sock.sendall(client_message.encode('utf-8'))
         except:
