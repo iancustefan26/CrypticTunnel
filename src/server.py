@@ -4,19 +4,27 @@ from usable import clear_screen
 import curses
 import keyboard
 from usable import listen_for_key
+from file_transfer import recive_file
+
 
 def listen_client(client_sock, client_addr, name):
     clear_screen()
     print(f"Accepted request from Client with IP : {client_addr}")
     client_name = client_sock.recv(100).decode('utf-8')
-    print(f"{name} has joined.")
+    print(f"{client_name} has joined.")
     try:
         while True:
             data = client_sock.recv(1024)
             if not data:
                 print("Client has disconnected")
                 break
-            print(f"{data.decode('utf-8')}")
+            message = data.decode('utf-8')
+            if message[:4] == "SEND":
+                file_name = message[5 : len(message)]
+                print(f"Reciveing file... : {file_name}")
+                recive_file(file_name, client_sock)
+            else:
+                print(message)
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:

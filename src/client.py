@@ -31,8 +31,11 @@ def connect_to_server(server_addr, server_port, name):
             file_path = client_message[len(name) + 8:]
             print(file_path)
             if os.path.exists(file_path):
+                file_name = os.path.basename(file_path)
+                print(file_name)
                 print("Sending file to the server...")
-                send_file(file_path)
+                client_sock.sendall(("SEND " + file_name).encode('utf-8'))
+                send_file(file_path, client_sock)
             else:
                 print(f"{file_path} : No such file or directory.")
         try:
