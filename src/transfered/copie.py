@@ -31,4 +31,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-stef: /send /Users/stefaniancu/Documents/VS Code/Cryptographic Secured Transfer Tunnel/src/copie.py

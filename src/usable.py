@@ -31,3 +31,15 @@ def listen_for_key():
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
 
+
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(("8.8.8.8", 80))
+        local_ip = s.getsockname()[0]
+    except Exception as e:
+        local_ip = "127.0.0.1"  #Fallback
+    finally:
+        s.close()
+    return local_ip
+
