@@ -3,6 +3,7 @@ from usable import clear_screen
 from usable import listen_for_key
 from file_transfer import recive_file
 from usable import get_local_ip
+from usable import get_public_ip
 
 def listen_client(client_sock, client_addr, name):
     clear_screen()
@@ -31,7 +32,7 @@ def listen_client(client_sock, client_addr, name):
 
 def start_server(name):
     host = get_local_ip()
-    port = 12345
+    port = 8001
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(10)
