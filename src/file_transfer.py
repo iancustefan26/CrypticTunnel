@@ -1,7 +1,10 @@
 import os
 
 def size_of_file(file_path):
-     return 0
+    file_size = os.stat(file_path).st_size / (1024 * 1024);
+    if file_size > 1000:
+         return file_size / 1024, "GB"
+    return file_size, "MB"
 
 def send_file(file_path, client_sock):
     with open(file_path, "rb") as file:
@@ -11,7 +14,7 @@ def send_file(file_path, client_sock):
             chunk = file.read(1024)
     end_marker = "END_OF_FILE_TRANSFER"
     client_sock.sendall(end_marker.encode('utf-8'))
-    print(f"File with path: {file_path} sent succesfully")
+    print(f"File : {os.path.basename(file_path)} sent succesfully")
 
 
 def recive_file(file_name, client_sock):
@@ -31,7 +34,7 @@ def recive_file(file_name, client_sock):
                         break
                     file.write(buffer)
                     buffer = b""
-                print(f"File {file_name} recived succesfully.")
+                print(f"File {file_name} recived succesfully.\n")
     except Exception as e:
                 print(f"An error has occured when transfering file... : {e}")
 

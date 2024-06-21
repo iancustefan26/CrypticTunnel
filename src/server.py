@@ -19,9 +19,15 @@ def listen_client(client_sock, client_addr, name):
             message = data.decode('utf-8')
             if message[:4] == "SEND":
                 file_name = message[5 : len(message)]
-                print(f"Reciveing file... : {file_name}")
-                recive_file(file_name, client_sock)
-            else:
+                print(f"{client_name} : wants to send you a file : {file_name}")
+                response = input("Recive it? (y/n) : ")
+                if response == "y":
+                    print(f"Reciveing file... : {file_name}")
+                    recive_file(file_name, client_sock)
+                else:
+                    print("File transfer declined.\n")
+                    continue
+            elif message[:5] != "/send":
                 print(message)
     except Exception as e:
         print(f"An error occurred: {e}")
