@@ -1,5 +1,8 @@
 import os
 
+def size_of_file(file_path):
+     return 0
+
 def send_file(file_path, client_sock):
     with open(file_path, "rb") as file:
         chunk = file.read(1024)
