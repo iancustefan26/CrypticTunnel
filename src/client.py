@@ -1,5 +1,4 @@
 import socket
-import threading
 from usable import clear_screen
 from usable import is_server_running
 import time

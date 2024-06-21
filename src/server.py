@@ -1,8 +1,5 @@
 import socket
-import threading
 from usable import clear_screen
-import curses
-import keyboard
 from usable import listen_for_key
 from file_transfer import recive_file
 from usable import get_local_ip
