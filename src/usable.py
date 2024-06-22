@@ -2,6 +2,7 @@ import socket
 import os
 from pynput import keyboard
 import requests
+import sys
 
 def is_server_running(ip, port, timeout = 5):
     try:
@@ -59,7 +60,6 @@ def get_local_ip():
 def get_public_ip():
     try:
         response = requests.get('https://ipinfo.io/ip')
-        print(response)
         if response.status_code == 200:
             return response.text.strip()
         else:
@@ -69,3 +69,7 @@ def get_public_ip():
     
     return None
 
+def print_progress(current_size, total_size, unit):
+    progress = (current_size / total_size) * 100
+    sys.stdout.write(f"\r{current_size:.2f} {unit} / {total_size:.2f} {unit} ({progress:.2f}%)")
+    sys.stdout.flush()
