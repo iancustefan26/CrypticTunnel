@@ -1,12 +1,6 @@
 import os
 from usable import print_progress
-
-
-def size_of_file(file_path):
-    file_size = os.stat(file_path).st_size / (1024 * 1024)
-    if file_size > 1000:
-         return round(file_size / 1024, 2), "GB"
-    return round(file_size, 2), "MB"
+from usable import size_of_file
 
 def send_file(file_path, client_sock):
     size, unit = size_of_file(file_path)

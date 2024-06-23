@@ -5,9 +5,9 @@ import time
 import os
 from file_transfer import send_file
 
-dont = True
 
 def connect_to_server(server_addr, server_port, name):
+    dont = True
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((server_addr, server_port))
     print(f"Connect to the server -- IP : {server_addr} -- PORT : {server_port}")

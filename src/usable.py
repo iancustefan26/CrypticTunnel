@@ -70,6 +70,22 @@ def get_public_ip():
     return None
 
 def print_progress(current_size, total_size, unit):
-    progress = (current_size / total_size) * 100
+    if total_size != 0:
+        progress = (current_size / total_size) * 100
+    else:
+        return
     sys.stdout.write(f"\r{current_size:.2f} {unit} / {total_size:.2f} {unit} ({progress:.2f}%)")
     sys.stdout.flush()
+
+
+def size_of_file(file_path):
+    file_size = os.stat(file_path).st_size / (1024 * 1024)
+    if file_size > 1000:
+         return round(file_size / 1024, 2), "GB"
+    return round(file_size, 2), "MB"
+
+
+def print_server_info(ip, port, client_name, client_ip):
+    print(f"\n\n      Server IP: {ip}     PORT: {port}", end = "\n\n")
+    print(f"     Client's IP: {client_ip}   Client's name: {client_name}", end = "\n\n")
+    print("--------------------------------------------------")

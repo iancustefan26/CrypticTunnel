@@ -4,12 +4,14 @@ from usable import listen_for_key
 from file_transfer import recive_file
 from usable import get_local_ip
 from usable import get_public_ip
+from usable import print_server_info
 
-def listen_client(client_sock, client_addr, name):
+def listen_client(client_sock, client_addr, name, client_ip):
     clear_screen()
     print(f"Accepted request from Client with IP : {client_addr}")
     client_name = client_sock.recv(100).decode('utf-8')
     print(f"{client_name} has joined.")
+    print_server_info(client_addr, 8001, client_name, client_ip)
     try:
         while True:
             data = client_sock.recv(1024)
@@ -45,7 +47,7 @@ def start_server(name):
     print(f"Server running on IP: {host} -- PORT: {port} is listening for requests...")
     while True:
         client_sock, client_addr = server_socket.accept()
-        listen_client(client_sock, client_addr, name)   
+        listen_client(client_sock, client_addr, name, client_addr)   
         
 
 
