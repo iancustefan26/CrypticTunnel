@@ -4,8 +4,6 @@ from usable import size_of_file
 
 def send_file(file_path, client_sock):
     size, unit = size_of_file(file_path)
-    #send size, unit #
-    #client_sock.sendall((len(str(size) + 2), str(size), unit))
     progress_size = 0
     skip_loop = 0
     with open(file_path, "rb") as file:
@@ -32,9 +30,6 @@ def recive_file(file_name, client_sock):
         os.makedirs(os.getcwd() + "/transfered")
     end_marker = b"END_OF_FILE_TRANSFER"
     buffer = b""
-    #length = client_sock.recv(4)
-   # size, unit = client_sock.recv(length)
-    #print(size, unit)
 
     try:
         with open(os.getcwd() + "/transfered/" + file_name, "wb") as file:
