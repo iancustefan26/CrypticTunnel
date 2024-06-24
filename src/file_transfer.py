@@ -24,7 +24,7 @@ def send_file(file_path, client_sock):
     end_marker = "END_OF_FILE_TRANSFER"
     client_sock.sendall(end_marker.encode('utf-8'))
     print_progress(size, size, unit)
-    print(f"\nFile : {os.path.basename(file_path)} sent succesfully")
+    print(f"\n[+] File : {os.path.basename(file_path)} sent succesfully")
 
 
 def recive_file(file_name, client_sock):
@@ -48,7 +48,7 @@ def recive_file(file_name, client_sock):
                         break
                     file.write(buffer)
                     buffer = b""
-                print(f"File {file_name} recived succesfully.\n")
+                print(f"[+] File {file_name} recived succesfully.\n")
     except Exception as e:
-                print(f"An error has occured when transfering file... : {e}")
+                print(f"[!] An error has occured when transfering file... : {e}")
 

@@ -15,7 +15,7 @@ def connect_to_server(server_addr, server_port, name):
     try:
         client_sock.sendall(name.encode('utf-8'))
     except:
-        print("Error")
+        print("[!] Error")
     time.sleep(2)
     clear_screen()
     while True:
@@ -55,16 +55,16 @@ def connect_to_server(server_addr, server_port, name):
 
 def main():
     clear_screen()
-    name = input("Type your nickname: ")
-    server_addres = input("Please type the server's IP addres: ")
-    server_port = input("Please type the server's PORT: ")
+    name = input("[?] Type your nickname: ")
+    server_addres = input("[?] Please type the server's IP addres: ")
+    server_port = input("[?] Please type the server's PORT: ")
     server_port = int(server_port)
     if not is_server_running(server_addres, server_port):
-        print("the server you are attempting to connect is not running or can't connect!; Please try again")
+        print("[-] The server you are attempting to connect is not running or can't connect!; Please try again")
         time.sleep(2)
         main()
     else:
-        print(f"Attempting to connect to server IP : {server_addres} with PORT : {server_port}")
+        print(f"[...] Attempting to connect to server IP : {server_addres} with PORT : {server_port}")
         connect_to_server(server_addres, server_port, name)
 
 if __name__ == "__main__":
