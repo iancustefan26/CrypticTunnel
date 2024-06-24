@@ -23,7 +23,7 @@ def send_file(file_path, client_sock):
             chunk = file.read(1024)
     end_marker = "END_OF_FILE_TRANSFER"
     client_sock.sendall(end_marker.encode('utf-8'))
-    print_progress(progress_size, size, unit)
+    print_progress(size, size, unit)
     print(f"\nFile : {os.path.basename(file_path)} sent succesfully")
 
 

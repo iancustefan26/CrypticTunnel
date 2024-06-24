@@ -23,6 +23,7 @@ def listen_client(client_sock, client_addr, name, client_ip):
                 file_name = message[5 : len(message)]
                 print(f"{client_name} : wants to send you a file : {file_name}")
                 response = input("Recive it? (y/n) : ")
+                client_sock.sendall(response.encode('utf-8'))
                 if response == "y":
                     print(f"Reciveing file... : {file_name}")
                     recive_file(file_name, client_sock)
