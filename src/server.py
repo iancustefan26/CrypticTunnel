@@ -20,7 +20,8 @@ def listen_client(client_sock, client_addr, name, client_ip):
             message = data.decode('utf-8')
             if message[:4] == "SEND":
                 file_name = message[5 : len(message)]
-                print(f"[=] {client_name} : wants to send you a file : {file_name}")
+                size = client_sock.recv(1024).decode('utf-8')
+                print(f"[=] {client_name} : wants to send you a file : {file_name}\n[=] Size of file is: {size}")
                 response = input("[?] Recive it? (y/n) : ")
                 client_sock.sendall(response.encode('utf-8'))
                 if response == "y":

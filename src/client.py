@@ -4,7 +4,7 @@ from usable import is_server_running
 import time
 import os
 from file_transfer import send_file
-
+from usable import size_of_file
 
 def connect_to_server(server_addr, server_port, name):
     dont = True
@@ -31,9 +31,12 @@ def connect_to_server(server_addr, server_port, name):
                     print("[-] Given file is a directory, please zip the file before sending")
                     continue
                 else:
+                    size, unit = size_of_file(file_path)
+                    size_msg = str(size) + " " + str(unit)
                     file_name = os.path.basename(file_path)
                     print("[...] Sending file to the server")
                     client_sock.sendall(("SEND " + file_name).encode('utf-8'))
+                    client_sock.sendall(size_msg.encode('utf-8'))
                     print("[...] Waiting for server's response")
                     response = client_sock.recv(1).decode('utf-8')
                     if response == 'y':
