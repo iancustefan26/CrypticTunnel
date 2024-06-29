@@ -24,8 +24,8 @@ void free_enc(RSA* rsa, BIO* bio_p, char* encrypted_message){
         delete encrypted_message;
 }
 
-std::pair<std::string, std::string> generateRSAKeyPair() {
-    std::pair<std::string, std::string> keyPair;
+pair<std::string, std::string> generateRSAKeyPair() {
+    pair<string, string> keyPair;
     RSA *rsa = nullptr;
     BIGNUM *bne = nullptr;
     BIO *bp_public = nullptr, *bp_private = nullptr;
@@ -34,39 +34,39 @@ std::pair<std::string, std::string> generateRSAKeyPair() {
 
     bne = BN_new();
     if (!BN_set_word(bne, e)) {
-        std::cerr << "Error setting RSA exponent" << std::endl;
+        cerr << "Error setting RSA exponent";
         free_all(rsa,bne,bp_public, bp_private);
-        return std::pair<std::string, std::string>("", "");
+        return pair<string, string>("", "");
     }
 
     rsa = RSA_new();
     if (!RSA_generate_key_ex(rsa, bits, bne, nullptr)) {
-        std::cerr << "Error generating RSA key" << std::endl;
+        std::cerr << "Error generating RSA key";
         free_all(rsa,bne,bp_public, bp_private);
-        return std::pair<std::string, std::string>("", "");
+        return pair<string, string>("", "");
     }
 
     bp_public = BIO_new(BIO_s_mem());
     if (!PEM_write_bio_RSAPublicKey(bp_public, rsa)) {
-        std::cerr << "Error writing RSA public key" << std::endl;
+        cerr << "Error writing RSA public key";
         free_all(rsa,bne,bp_public, bp_private);
-        return std::pair<std::string, std::string>("", "");
+        return std::pair<string, string>("", "");
     }
 
     bp_private = BIO_new(BIO_s_mem());
     if (!PEM_write_bio_RSAPrivateKey(bp_private, rsa, nullptr, nullptr, 0, nullptr, nullptr)) {
-        std::cerr << "Error writing RSA private key" << std::endl;
+        cerr << "Error writing RSA private key";
         free_all(rsa,bne,bp_public, bp_private);
-        return std::pair<std::string, std::string>("", "");
+        return ::pair<string, string>("", "");
     }
 
     char *pub_key_ptr = nullptr;
     long pub_key_len = BIO_get_mem_data(bp_public, &pub_key_ptr);
-    keyPair.first = std::string(pub_key_ptr, pub_key_len);
+    keyPair.first = string(pub_key_ptr, pub_key_len);
 
     char *priv_key_ptr = nullptr;
     long priv_key_len = BIO_get_mem_data(bp_private, &priv_key_ptr);
-    keyPair.second = std::string(priv_key_ptr, priv_key_len);
+    keyPair.second = string(priv_key_ptr, priv_key_len);
 
     return keyPair;
 }
