@@ -6,11 +6,22 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
+using namespace std;
+
 void free_all(RSA* rsa, BIGNUM* bne, BIO* bp_public, BIO* bp_private){
     if (bne) BN_free(bne);
     if (rsa) RSA_free(rsa);
     if (bp_public) BIO_free_all(bp_public);
     if (bp_private) BIO_free_all(bp_private);
+}
+
+void free_enc(RSA* rsa, BIO* bio_p, char* encrypted_message){
+    if(rsa)
+        RSA_free(rsa);
+    if(bio_p)
+        BIO_free(bio_p);
+    if(encrypted_message)
+        delete encrypted_message;
 }
 
 std::pair<std::string, std::string> generateRSAKeyPair() {
@@ -44,7 +55,6 @@ std::pair<std::string, std::string> generateRSAKeyPair() {
 
     bp_private = BIO_new(BIO_s_mem());
     if (!PEM_write_bio_RSAPrivateKey(bp_private, rsa, nullptr, nullptr, 0, nullptr, nullptr)) {
-        // Handle error
         std::cerr << "Error writing RSA private key" << std::endl;
         free_all(rsa,bne,bp_public, bp_private);
         return std::pair<std::string, std::string>("", "");
@@ -61,11 +71,49 @@ std::pair<std::string, std::string> generateRSAKeyPair() {
     return keyPair;
 }
 
+string rsa_encrypt(const string &plain, const string public_key){
+    RSA* rsa = nullptr;
+    BIO* bio_p = nullptr;
+    string cipher;
+
+    bio_p = BIO_new_mem_buf((void*)public_key.c_str(), -1);
+    if(! bio_p){
+        cerr << "Error creating BIO";
+        free_enc(rsa, bio_p, nullptr);
+    }
+    rsa = PEM_read_bio_RSAPublicKey(bio_p, nullptr, nullptr, nullptr);
+    if(!rsa){
+        cerr << "Error loading RSA Public Key";
+        free_enc(rsa, bio_p, nullptr);
+    }
+    int rsa_len = RSA_size(rsa);
+    unsigned char* encrypted_message = new unsigned char[rsa_len];
+    int enc_message_length = RSA_public_encrypt(
+        plain.length(),
+        (const unsigned char*)plain.c_str(),
+        encrypted_message,
+        rsa,
+        RSA_PKCS1_PADDING
+    );
+    if(enc_message_length == -1){
+        cerr << "Error encrypting message with the public key";
+        free_enc(rsa, bio_p, reinterpret_cast<char*>(encrypted_message));
+    }
+
+    cipher = string((char*)encrypted_message, enc_message_length);
+
+    return cipher;
+}
 
 int main() {
     std::pair<std::string, std::string> key_pair = generateRSAKeyPair();
 
     std::cout << key_pair.first << "\n" << key_pair.second;
+
+    string plain = "Salut, sunt Stefan!";
+    string enc_plain = rsa_encrypt(plain, key_pair.first);
+
+    cout << enc_plain << "\n";
 
     return 0;
 }
