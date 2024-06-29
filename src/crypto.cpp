@@ -7,7 +7,6 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 void free_all(RSA* rsa, BIGNUM* bne, BIO* bp_public, BIO* bp_private){
-    // Cleanup
     if (bne) BN_free(bne);
     if (rsa) RSA_free(rsa);
     if (bp_public) BIO_free_all(bp_public);
@@ -22,10 +21,8 @@ std::pair<std::string, std::string> generateRSAKeyPair() {
     int bits = 2048;
     unsigned long e = RSA_F4;
 
-    // 1. Generate RSA Key
     bne = BN_new();
     if (!BN_set_word(bne, e)) {
-        // Handle error
         std::cerr << "Error setting RSA exponent" << std::endl;
         free_all(rsa,bne,bp_public, bp_private);
         return std::pair<std::string, std::string>("", "");
@@ -33,16 +30,13 @@ std::pair<std::string, std::string> generateRSAKeyPair() {
 
     rsa = RSA_new();
     if (!RSA_generate_key_ex(rsa, bits, bne, nullptr)) {
-        // Handle error
         std::cerr << "Error generating RSA key" << std::endl;
         free_all(rsa,bne,bp_public, bp_private);
         return std::pair<std::string, std::string>("", "");
     }
 
-    // 2. Write RSA key to BIO
     bp_public = BIO_new(BIO_s_mem());
     if (!PEM_write_bio_RSAPublicKey(bp_public, rsa)) {
-        // Handle error
         std::cerr << "Error writing RSA public key" << std::endl;
         free_all(rsa,bne,bp_public, bp_private);
         return std::pair<std::string, std::string>("", "");
@@ -56,7 +50,6 @@ std::pair<std::string, std::string> generateRSAKeyPair() {
         return std::pair<std::string, std::string>("", "");
     }
 
-    // 3. Read from BIO to string
     char *pub_key_ptr = nullptr;
     long pub_key_len = BIO_get_mem_data(bp_public, &pub_key_ptr);
     keyPair.first = std::string(pub_key_ptr, pub_key_len);
@@ -64,7 +57,6 @@ std::pair<std::string, std::string> generateRSAKeyPair() {
     char *priv_key_ptr = nullptr;
     long priv_key_len = BIO_get_mem_data(bp_private, &priv_key_ptr);
     keyPair.second = std::string(priv_key_ptr, priv_key_len);
-
 
     return keyPair;
 }
