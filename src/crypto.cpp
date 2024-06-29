@@ -34,28 +34,28 @@ pair<std::string, std::string> generateRSAKeyPair() {
 
     bne = BN_new();
     if (!BN_set_word(bne, e)) {
-        cerr << "Error setting RSA exponent";
+        cerr << "Error setting RSA exponent: ";
         free_all(rsa,bne,bp_public, bp_private);
         return pair<string, string>("", "");
     }
 
     rsa = RSA_new();
     if (!RSA_generate_key_ex(rsa, bits, bne, nullptr)) {
-        std::cerr << "Error generating RSA key";
+        std::cerr << "Error generating RSA key: ";
         free_all(rsa,bne,bp_public, bp_private);
         return pair<string, string>("", "");
     }
 
     bp_public = BIO_new(BIO_s_mem());
     if (!PEM_write_bio_RSAPublicKey(bp_public, rsa)) {
-        cerr << "Error writing RSA public key";
+        cerr << "Error writing RSA public key; ";
         free_all(rsa,bne,bp_public, bp_private);
         return std::pair<string, string>("", "");
     }
 
     bp_private = BIO_new(BIO_s_mem());
     if (!PEM_write_bio_RSAPrivateKey(bp_private, rsa, nullptr, nullptr, 0, nullptr, nullptr)) {
-        cerr << "Error writing RSA private key";
+        cerr << "Error writing RSA private key: ";
         free_all(rsa,bne,bp_public, bp_private);
         return ::pair<string, string>("", "");
     }
@@ -78,12 +78,12 @@ string rsa_encrypt(const string &plain, const string public_key){
 
     bio_p = BIO_new_mem_buf((void*)public_key.c_str(), -1);
     if(! bio_p){
-        cerr << "Error creating BIO";
+        cerr << "Error creating BIO: ";
         free_enc(rsa, bio_p, nullptr);
     }
     rsa = PEM_read_bio_RSAPublicKey(bio_p, nullptr, nullptr, nullptr);
     if(!rsa){
-        cerr << "Error loading RSA Public Key";
+        cerr << "Error loading RSA Public Key: ";
         free_enc(rsa, bio_p, nullptr);
     }
     int rsa_len = RSA_size(rsa);
@@ -96,7 +96,7 @@ string rsa_encrypt(const string &plain, const string public_key){
         RSA_PKCS1_PADDING
     );
     if(enc_message_length == -1){
-        cerr << "Error encrypting message with the public key";
+        cerr << "Error encrypting message with the public key: ";
         free_enc(rsa, bio_p, reinterpret_cast<char*>(encrypted_message));
     }
 
@@ -112,13 +112,13 @@ string rsa_decrypt(const string &cipher, const string private_key){
 
     bio_p = BIO_new_mem_buf((void*)private_key.c_str(), -1);
     if(!bio_p){
-        cerr << "Error when loading private key into BIO";
+        cerr << "Error when loading private key into BIO: ";
         free_enc(rsa, bio_p, nullptr);
     }
 
     rsa = PEM_read_bio_RSAPrivateKey(bio_p, nullptr, nullptr, nullptr);
     if(!rsa){
-        cerr << "Error loading private key from BIO";
+        cerr << "Error loading private key from BIO: ";
         free_enc(rsa, bio_p, nullptr);
     }
 
@@ -132,7 +132,7 @@ string rsa_decrypt(const string &cipher, const string private_key){
         RSA_PKCS1_PADDING
     );
     if(decr_message_length == -1){
-        cerr << "Error when decrypting cipher";
+        cerr << "Error when decrypting cipher: ";
         free_enc(rsa, bio_p, reinterpret_cast<char*>(decryted_message));
     }
 
@@ -146,7 +146,8 @@ int main() {
 
     std::cout << key_pair.first << "\n" << key_pair.second;
 
-    string plain = "Salut, sunt Stefan!";
+    string plain = "În 1996, o firmă privată din România a confecționat o monedă de probă"
+    " - de fapt, un jeton -, destinată colecționarilor , având valoarea nominală";
     string enc_plain = rsa_encrypt(plain, key_pair.first);
 
     cout << enc_plain << "\n";
