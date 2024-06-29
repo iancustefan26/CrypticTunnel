@@ -87,7 +87,7 @@ string rsa_encrypt(const string &plain, const string public_key){
         free_enc(rsa, bio_p, nullptr);
     }
     int rsa_len = RSA_size(rsa);
-    unsigned char* encrypted_message = new unsigned char[rsa_len];
+    unsigned char* encrypted_message = new unsigned char[rsa_len + 1];
     int enc_message_length = RSA_public_encrypt(
         plain.length(),
         (const unsigned char*)plain.c_str(),
@@ -105,6 +105,42 @@ string rsa_encrypt(const string &plain, const string public_key){
     return cipher;
 }
 
+string rsa_decrypt(const string &cipher, const string private_key){
+    RSA* rsa;
+    BIO* bio_p;
+    string plain;
+
+    bio_p = BIO_new_mem_buf((void*)private_key.c_str(), -1);
+    if(!bio_p){
+        cerr << "Error when loading private key into BIO";
+        free_enc(rsa, bio_p, nullptr);
+    }
+
+    rsa = PEM_read_bio_RSAPrivateKey(bio_p, nullptr, nullptr, nullptr);
+    if(!rsa){
+        cerr << "Error loading private key from BIO";
+        free_enc(rsa, bio_p, nullptr);
+    }
+
+    int rsa_len = RSA_size(rsa);
+    unsigned char* decryted_message = new unsigned char[rsa_len + 1];
+    int decr_message_length = RSA_private_decrypt(
+        cipher.length(),
+        (const unsigned char*)cipher.c_str(),
+        decryted_message,
+        rsa,
+        RSA_PKCS1_PADDING
+    );
+    if(decr_message_length == -1){
+        cerr << "Error when decrypting cipher";
+        free_enc(rsa, bio_p, reinterpret_cast<char*>(decryted_message));
+    }
+
+    plain = string((char*)decryted_message, decr_message_length);
+
+    return plain;
+}
+
 int main() {
     std::pair<std::string, std::string> key_pair = generateRSAKeyPair();
 
@@ -114,6 +150,11 @@ int main() {
     string enc_plain = rsa_encrypt(plain, key_pair.first);
 
     cout << enc_plain << "\n";
+
+    string decrypted_plain = rsa_decrypt(enc_plain, key_pair.second);
+
+    cout << decrypted_plain << "\n";
+
 
     return 0;
 }
