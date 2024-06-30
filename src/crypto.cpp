@@ -96,7 +96,7 @@ pair<std::string, std::string> generateRSAKeyPair() {
 }
 
 py::bytes rsa_encrypt(string &plain, const string& public_key){
-    cout << plain << "\n" << public_key << "\n";
+    //cout << plain << "\n" << public_key << "\n";
     RSA* rsa = nullptr;
     BIO* bio_p = nullptr;
     string cipher;
@@ -111,7 +111,6 @@ py::bytes rsa_encrypt(string &plain, const string& public_key){
         cerr << "Error loading RSA Public Key: ";
         free_enc(rsa, bio_p, nullptr);
     }
-    cout << "am ajuns";
     int rsa_len = RSA_size(rsa);
     unsigned char* encrypted_message = new unsigned char[rsa_len + 1];
     int enc_message_length = RSA_public_encrypt(
@@ -121,7 +120,6 @@ py::bytes rsa_encrypt(string &plain, const string& public_key){
         rsa,
         RSA_PKCS1_PADDING
     );
-    cout << " pana aici";
     if(enc_message_length == -1){
         cerr << "Error encrypting message with the public key: ";
         free_enc(rsa, bio_p, reinterpret_cast<char*>(encrypted_message));
@@ -136,11 +134,16 @@ py::bytes rsa_encrypt(string &plain, const string& public_key){
     return file_name;
 }
 
-string rsa_decrypt(const string &cipher, const string private_key){
+string rsa_decrypt(const string private_key){
     RSA* rsa;
     BIO* bio_p;
     string plain;
-
+    string cipher;
+    ifstream input("temp.bin");
+    ostringstream oss;
+    oss << input.rdbuf();
+    cipher = oss.str();
+    //cout << cipher;
     bio_p = BIO_new_mem_buf((void*)private_key.c_str(), -1);
     if(!bio_p){
         cerr << "Error when loading private key into BIO: ";
