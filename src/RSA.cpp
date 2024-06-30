@@ -1,16 +1,13 @@
+
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
 #include <iostream>
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#include <utility>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 using namespace std;
-namespace py = pybind11;
 
 void free_all(RSA* rsa, BIGNUM* bne, BIO* bp_public, BIO* bp_private){
     if (bne) BN_free(bne);
@@ -110,8 +107,8 @@ string rsa_encrypt(const string &plain, const string public_key){
 }
 
 string rsa_decrypt(const string &cipher, const string private_key){
-    RSA* rsa;
-    BIO* bio_p;
+    RSA* rsa = nullptr;
+    BIO* bio_p = nullptr;
     string plain;
 
     bio_p = BIO_new_mem_buf((void*)private_key.c_str(), -1);
@@ -144,22 +141,7 @@ string rsa_decrypt(const string &cipher, const string private_key){
 
     return plain;
 }
-int method(int x){
-    cout << x * 2;
-    return 0;
-}
 
-PYBIND11_MODULE(crypto, m){
-    m.doc() = "RSA functions";
-
-    m.def("rsa_decrypt", &rsa_decrypt, "Function that decrypts a RSA cipher using the private key");
-    m.def("rsa_encrypt", &rsa_encrypt, "Function that encrypts a plaintext using a public key");
-    m.def("generateRSAKeyPair", &generateRSAKeyPair, "Function that returns a tuple for RSA keys <public_key, private_key");
-    m.def("method", &method, "A test function ; (int)");
-
-}
-
-/*
 int main() {
     std::pair<std::string, std::string> key_pair = generateRSAKeyPair();
 
@@ -178,7 +160,6 @@ int main() {
 
     return 0;
 }
-*/
 
 
 #pragma GCC diagnostic pop
