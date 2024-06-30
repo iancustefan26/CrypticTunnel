@@ -5,12 +5,32 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <utility>
+#include <locale>
+#include <codecvt>
+#include <sstream>
+#include <iomanip>
+#include <fstream>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 using namespace std;
 namespace py = pybind11;
+
+std::string string_to_utf8(const std::string& str) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+    std::wstring wide = std::wstring(str.begin(), str.end());
+    return converter.to_bytes(wide); 
+}
+
+std::string string_to_hex(const std::string& input) {
+    std::stringstream ss;
+    ss << std::hex << std::setfill('0');
+    for (size_t i = 0; i < input.length(); ++i) {
+        ss << "\\x" << std::setw(2) << static_cast<unsigned>(static_cast<unsigned char>(input[i]));
+    }
+    return ss.str();
+}
 
 void free_all(RSA* rsa, BIGNUM* bne, BIO* bp_public, BIO* bp_private){
     if (bne) BN_free(bne);
@@ -75,7 +95,8 @@ pair<std::string, std::string> generateRSAKeyPair() {
     return keyPair;
 }
 
-string rsa_encrypt(const string &plain, const string public_key){
+py::bytes rsa_encrypt(string &plain, const string& public_key){
+    cout << plain << "\n" << public_key << "\n";
     RSA* rsa = nullptr;
     BIO* bio_p = nullptr;
     string cipher;
@@ -90,6 +111,7 @@ string rsa_encrypt(const string &plain, const string public_key){
         cerr << "Error loading RSA Public Key: ";
         free_enc(rsa, bio_p, nullptr);
     }
+    cout << "am ajuns";
     int rsa_len = RSA_size(rsa);
     unsigned char* encrypted_message = new unsigned char[rsa_len + 1];
     int enc_message_length = RSA_public_encrypt(
@@ -99,14 +121,19 @@ string rsa_encrypt(const string &plain, const string public_key){
         rsa,
         RSA_PKCS1_PADDING
     );
+    cout << " pana aici";
     if(enc_message_length == -1){
         cerr << "Error encrypting message with the public key: ";
         free_enc(rsa, bio_p, reinterpret_cast<char*>(encrypted_message));
     }
 
     cipher = string((char*)encrypted_message, enc_message_length);
+    string file_name = "temp.bin";
+    ofstream output(file_name, std::ios::out | std::ios::app);
+    output << cipher;
+    output.close();
 
-    return cipher;
+    return file_name;
 }
 
 string rsa_decrypt(const string &cipher, const string private_key){
@@ -149,36 +176,20 @@ int method(int x){
     return 0;
 }
 
-PYBIND11_MODULE(crypto, m){
+void test_method(const string param){
+    cout << param;
+}
+
+PYBIND11_MODULE(rsalib, m){
     m.doc() = "RSA functions";
 
     m.def("rsa_decrypt", &rsa_decrypt, "Function that decrypts a RSA cipher using the private key");
     m.def("rsa_encrypt", &rsa_encrypt, "Function that encrypts a plaintext using a public key");
     m.def("generateRSAKeyPair", &generateRSAKeyPair, "Function that returns a tuple for RSA keys <public_key, private_key");
     m.def("method", &method, "A test function ; (int)");
+    m.def("test_string", &test_method, "Method to test string pass");
 
 }
-
-/*
-int main() {
-    std::pair<std::string, std::string> key_pair = generateRSAKeyPair();
-
-    std::cout << key_pair.first << "\n" << key_pair.second;
-
-    string plain = "În 1996, o firmă privată din România a confecționat o monedă de probă"
-    " - de fapt, un jeton -, destinată colecționarilor , având valoarea nominală";
-    string enc_plain = rsa_encrypt(plain, key_pair.first);
-
-    cout << enc_plain << "\n";
-
-    string decrypted_plain = rsa_decrypt(enc_plain, key_pair.second);
-
-    cout << decrypted_plain << "\n";
-
-
-    return 0;
-}
-*/
 
 
 #pragma GCC diagnostic pop

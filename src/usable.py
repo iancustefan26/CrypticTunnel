@@ -1,6 +1,5 @@
 import socket
 import os
-from pynput import keyboard
 import requests
 import sys
 
