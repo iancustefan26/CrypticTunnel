@@ -30,6 +30,7 @@ def client_key_exchange(server_sock):
 
 def recive_key_exchange(client_sock, private_key):
     recive_file("temp.bin", client_sock)
+    print(f"Private key is: {private_key}")
     #session_key = rsalib.rsa_decrypt(private_key)
     #print(f"After recive: {session_key}")
     #return session_key
