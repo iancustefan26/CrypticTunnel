@@ -3,26 +3,41 @@ import socket
 import rsalib
 import random
 import string
+from file_transfer import send_file
+from file_transfer import recive_file
 
-def client_hello(client_sock, name):
+def client_hello(server_sock, name):
     hello = f"Hello, my name is {name}"
-    client_sock.sendall(hello.encode('utf-8'))
+    server_sock.sendall(hello.encode('utf-8'))
+    print("Printed hello from client")
 
-def server_hello(server_sock):
-    hello_from_client = server_sock.recv(1024).decode('utf-8')
-    public_key, private_key = rsalib.generateRSAKeyPair()
-    server_sock.sendall(public_key.encode('utf-8'))
+def server_hello(client_sock, public_key):
+    print("Waiting for client hello...")
+    hello_from_client = client_sock.recv(1024).decode('utf-8')
+    print(hello_from_client)
+    client_sock.sendall(public_key.encode('utf-8'))
 
-def client_key_exchange():
-    #public_key = clinet_sock.recv(1024)
-    public_key, private_key = rsalib.generateRSAKeyPair()
-    random_stuff = ''.join(random.choice(string.printable) for x in range(30))
-    print(random_stuff)
-    encrypted_stuff_file = rsalib.rsa_encrypt(random_stuff, public_key)
-    with open(encrypted_stuff_file, "rb") as f:
-        content = f.read(1024)
-    print(content)
-    decrypted_random = rsalib.rsa_decrypt(private_key)
-    print(decrypted_random)
+def client_key_exchange(server_sock):
+    public_key = server_sock.recv(1024).decode('utf-8')
+    print(f"Public key is: {public_key}")
+    session_key = ''.join(random.choice(string.printable) for x in range(30))
+    print(f"Before sending: {session_key}")
+    encrypted_random_file = rsalib.rsa_encrypt(session_key, public_key)
+    print(f"Session key generated from file is : {session_key}")
+    send_file(encrypted_random_file, server_sock)
 
-client_key_exchange()
+    return session_key
+
+def recive_key_exchange(client_sock, private_key):
+    recive_file("temp.bin", client_sock)
+    #session_key = rsalib.rsa_decrypt(private_key)
+    #print(f"After recive: {session_key}")
+    #return session_key
+
+
+
+    
+    
+
+
+

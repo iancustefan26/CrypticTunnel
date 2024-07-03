@@ -4,12 +4,27 @@ from file_transfer import recive_file
 from usable import get_local_ip
 from usable import get_public_ip
 from usable import print_server_info
+from TLS_tunnel_init import *
+import rsalib
+
+def init_TLS_tunnel(client_sock):
+    # public_key, private_key = rsalib.generateRSAKeyPair()
+    # print(public_key)
+    # server_hello(client_sock, public_key)
+    # session_key = recive_key_exchange(client_sock, private_key)
+    # print(f"[+] TLS Tunnel established! : {session_key}")
+    public_key, private_key = rsalib.generateRSAKeyPair()
+    server_hello(client_sock, public_key)
+    session_key = recive_key_exchange(client_sock, private_key)
+    #print(f"From server: session key is {session_key}")
+
 
 def listen_client(client_sock, client_addr, name, client_ip):
     clear_screen()
     print(f"[+] Accepted request from Client with IP : {client_addr}")
     client_name = client_sock.recv(100).decode('utf-8')
     print(f"[+] {client_name} has joined.")
+    init_TLS_tunnel(client_sock)
     print_server_info(client_addr, 8001, client_name, client_ip)
     try:
         while True:

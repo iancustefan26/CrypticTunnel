@@ -5,6 +5,17 @@ import time
 import os
 from file_transfer import send_file
 from usable import size_of_file
+from TLS_tunnel_init import *
+
+def init_TLS_tunnel(server_sock, name):
+    # print("[...] Esatblishing TLS encrypted tunnel...")
+    # client_hello(server_sock, name)
+    # time.sleep(1)
+    # session_key = client_key_exchange(server_sock)
+    # print(f"[+] From client session_key generated: {session_key}")
+    client_hello(server_sock, name)
+    session_key = client_key_exchange(server_sock)
+    
 
 def connect_to_server(server_addr, server_port, name):
     dont = True
@@ -15,9 +26,10 @@ def connect_to_server(server_addr, server_port, name):
     try:
         client_sock.sendall(name.encode('utf-8'))
     except:
-        print("[!] Error")
+        print("[!] Error sending name")
     time.sleep(2)
     clear_screen()
+    init_TLS_tunnel(client_sock, name)
     while True:
         client_message = name + ": " + input(f"{name}: ")
         if client_message[len(name) + 2:] == "/quit":

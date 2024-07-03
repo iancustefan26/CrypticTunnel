@@ -17,7 +17,7 @@ print(printable_data)
 
 decrypted_plain = rsalib.rsa_decrypt(private_key)
 
-os.remove(out_file)
+#os.remove(out_file)
 
 print(decrypted_plain)
 
