@@ -13,6 +13,8 @@ with open(out_file, "rb") as f:
 
 printable_data = ''.join([chr(byte) for byte in data])
 
+print(printable_data)
+
 decrypted_plain = rsalib.rsa_decrypt(private_key)
 
 os.remove(out_file)

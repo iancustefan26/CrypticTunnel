@@ -15,8 +15,14 @@ def server_hello(server_sock):
 
 def client_key_exchange():
     #public_key = clinet_sock.recv(1024)
+    public_key, private_key = rsalib.generateRSAKeyPair()
     random_stuff = ''.join(random.choice(string.printable) for x in range(30))
     print(random_stuff)
-    #session_key_output_file = rsalib.rsa_encrypt()
+    encrypted_stuff_file = rsalib.rsa_encrypt(random_stuff, public_key)
+    with open(encrypted_stuff_file, "rb") as f:
+        content = f.read(1024)
+    print(content)
+    decrypted_random = rsalib.rsa_decrypt(private_key)
+    print(decrypted_random)
 
 client_key_exchange()

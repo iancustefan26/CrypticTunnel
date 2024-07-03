@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iomanip>
 #include <fstream>
+#include <stdio.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -58,28 +59,28 @@ pair<std::string, std::string> generateRSAKeyPair() {
 
     bne = BN_new();
     if (!BN_set_word(bne, e)) {
-        cerr << "Error setting RSA exponent: ";
+        cerr << "\nError setting RSA exponent: ";
         free_all(rsa,bne,bp_public, bp_private);
         return pair<string, string>("", "");
     }
 
     rsa = RSA_new();
     if (!RSA_generate_key_ex(rsa, bits, bne, nullptr)) {
-        std::cerr << "Error generating RSA key: ";
+        std::cerr << "\nError generating RSA key: ";
         free_all(rsa,bne,bp_public, bp_private);
         return pair<string, string>("", "");
     }
 
     bp_public = BIO_new(BIO_s_mem());
     if (!PEM_write_bio_RSAPublicKey(bp_public, rsa)) {
-        cerr << "Error writing RSA public key; ";
+        cerr << "\nError writing RSA public key; ";
         free_all(rsa,bne,bp_public, bp_private);
         return std::pair<string, string>("", "");
     }
 
     bp_private = BIO_new(BIO_s_mem());
     if (!PEM_write_bio_RSAPrivateKey(bp_private, rsa, nullptr, nullptr, 0, nullptr, nullptr)) {
-        cerr << "Error writing RSA private key: ";
+        cerr << "\nError writing RSA private key: ";
         free_all(rsa,bne,bp_public, bp_private);
         return ::pair<string, string>("", "");
     }
@@ -95,7 +96,7 @@ pair<std::string, std::string> generateRSAKeyPair() {
     return keyPair;
 }
 
-py::bytes rsa_encrypt(string &plain, const string& public_key){
+string rsa_encrypt(string &plain, const string& public_key){
     //cout << plain << "\n" << public_key << "\n";
     RSA* rsa = nullptr;
     BIO* bio_p = nullptr;
@@ -103,12 +104,12 @@ py::bytes rsa_encrypt(string &plain, const string& public_key){
 
     bio_p = BIO_new_mem_buf((void*)public_key.c_str(), -1);
     if(! bio_p){
-        cerr << "Error creating BIO: ";
+        cerr << "\nError creating BIO: ";
         free_enc(rsa, bio_p, nullptr);
     }
     rsa = PEM_read_bio_RSAPublicKey(bio_p, nullptr, nullptr, nullptr);
     if(!rsa){
-        cerr << "Error loading RSA Public Key: ";
+        cerr << "\nError loading RSA Public Key: ";
         free_enc(rsa, bio_p, nullptr);
     }
     int rsa_len = RSA_size(rsa);
@@ -121,7 +122,7 @@ py::bytes rsa_encrypt(string &plain, const string& public_key){
         RSA_PKCS1_PADDING
     );
     if(enc_message_length == -1){
-        cerr << "Error encrypting message with the public key: ";
+        cerr << "\nError encrypting message with the public key: ";
         free_enc(rsa, bio_p, reinterpret_cast<char*>(encrypted_message));
     }
 
@@ -143,16 +144,18 @@ string rsa_decrypt(const string private_key){
     ostringstream oss;
     oss << input.rdbuf();
     cipher = oss.str();
-    //cout << cipher;
+    input.close();
+    if(remove("temp.bin") != 0)
+        cerr << "\nError when removing temp.bin (encrypted data)\n";
     bio_p = BIO_new_mem_buf((void*)private_key.c_str(), -1);
     if(!bio_p){
-        cerr << "Error when loading private key into BIO: ";
+        cerr << "Error when loading private key into BIO: \n";
         free_enc(rsa, bio_p, nullptr);
     }
 
     rsa = PEM_read_bio_RSAPrivateKey(bio_p, nullptr, nullptr, nullptr);
     if(!rsa){
-        cerr << "Error loading private key from BIO: ";
+        cerr << "\nError loading private key from BIO: \n";
         free_enc(rsa, bio_p, nullptr);
     }
 
@@ -166,7 +169,7 @@ string rsa_decrypt(const string private_key){
         RSA_PKCS1_PADDING
     );
     if(decr_message_length == -1){
-        cerr << "Error when decrypting cipher: ";
+        cerr << "\nError when decrypting cipher: \n";
         free_enc(rsa, bio_p, reinterpret_cast<char*>(decryted_message));
     }
 
