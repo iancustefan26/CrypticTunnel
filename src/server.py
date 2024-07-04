@@ -6,6 +6,7 @@ from usable import get_public_ip
 from usable import print_server_info
 from TLS_tunnel_init import *
 import rsalib
+import os
 
 def init_TLS_tunnel(client_sock):
     # public_key, private_key = rsalib.generateRSAKeyPair()
@@ -16,7 +17,8 @@ def init_TLS_tunnel(client_sock):
     public_key, private_key = rsalib.generateRSAKeyPair()
     server_hello(client_sock, public_key)
     session_key = recive_key_exchange(client_sock, private_key)
-    print(f"From server: session key is {session_key}")
+    print(f"Session key is : {session_key}")
+    os.remove("transfered/temp.bin")
 
 
 def listen_client(client_sock, client_addr, name, client_ip):

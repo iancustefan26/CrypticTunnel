@@ -15,6 +15,8 @@ def init_TLS_tunnel(server_sock, name):
     # print(f"[+] From client session_key generated: {session_key}")
     client_hello(server_sock, name)
     session_key = client_key_exchange(server_sock)
+    print(f"Session key is : {session_key}")
+    os.remove("temp.bin")
     
 
 def connect_to_server(server_addr, server_port, name):

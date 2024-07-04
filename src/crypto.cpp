@@ -46,7 +46,7 @@ void free_enc(RSA* rsa, BIO* bio_p, char* encrypted_message){
     if(bio_p)
         BIO_free(bio_p);
     if(encrypted_message)
-        delete encrypted_message;
+        delete[] encrypted_message;
 }
 
 pair<std::string, std::string> generateRSAKeyPair() {
@@ -168,9 +168,10 @@ string rsa_decrypt(const string private_key){
         rsa,
         RSA_PKCS1_PADDING
     );
-    if(decr_message_length == -1){
-        cerr << "\nError when decrypting cipher: \n";
+    if (decr_message_length == -1) {
+        cerr << "Error when decrypting cipher: " << ERR_error_string(ERR_get_error(), nullptr) << "\n";
         free_enc(rsa, bio_p, reinterpret_cast<char*>(decryted_message));
+        return "";
     }
 
     plain = string((char*)decryted_message, decr_message_length);
