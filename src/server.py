@@ -9,11 +9,6 @@ import rsalib
 import os
 
 def init_TLS_tunnel(client_sock):
-    # public_key, private_key = rsalib.generateRSAKeyPair()
-    # print(public_key)
-    # server_hello(client_sock, public_key)
-    # session_key = recive_key_exchange(client_sock, private_key)
-    # print(f"[+] TLS Tunnel established! : {session_key}")
     public_key, private_key = rsalib.generateRSAKeyPair()
     server_hello(client_sock, public_key)
     session_key = recive_key_exchange(client_sock, private_key)

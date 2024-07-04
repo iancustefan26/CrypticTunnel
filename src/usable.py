@@ -6,7 +6,6 @@ import sys
 def is_server_running(ip, port, timeout = 5):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_sock:
-            #sock.timeout(timeout)
             print(f"[...] Trying to connect to {ip}")
             try:
                 client_sock.connect((ip, port))
@@ -19,7 +18,6 @@ def is_server_running(ip, port, timeout = 5):
                 print(f"[!] Error connecting to server: {e}")
             finally:
                 client_sock.close()
-            #print("Connected")
             return True
     except (socket.timeout, socket.error):
         return False

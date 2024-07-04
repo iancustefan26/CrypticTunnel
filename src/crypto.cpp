@@ -97,7 +97,6 @@ pair<std::string, std::string> generateRSAKeyPair() {
 }
 
 string rsa_encrypt(string &plain, const string& public_key){
-    //cout << plain << "\n" << public_key << "\n";
     RSA* rsa = nullptr;
     BIO* bio_p = nullptr;
     string cipher;
@@ -145,8 +144,6 @@ string rsa_decrypt(const string private_key){
     oss << input.rdbuf();
     cipher = oss.str();
     input.close();
-    //if(remove("/transfered/temp.bin") != 0)
-        //cerr << "\nError when removing temp.bin (encrypted data)\n";
     bio_p = BIO_new_mem_buf((void*)private_key.c_str(), -1);
     if(!bio_p){
         cerr << "Error when loading private key into BIO: \n";
