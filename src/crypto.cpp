@@ -18,17 +18,17 @@
 using namespace std;
 namespace py = pybind11;
 
-std::string string_to_utf8(const std::string& str) {
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring wide = std::wstring(str.begin(), str.end());
+string string_to_utf8(const string& str) {
+    wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
+    wstring wide = wstring(str.begin(), str.end());
     return converter.to_bytes(wide); 
 }
 
-std::string string_to_hex(const std::string& input) {
-    std::stringstream ss;
-    ss << std::hex << std::setfill('0');
+string string_to_hex(const string& input) {
+    stringstream ss;
+    ss << hex << setfill('0');
     for (size_t i = 0; i < input.length(); ++i) {
-        ss << "\\x" << std::setw(2) << static_cast<unsigned>(static_cast<unsigned char>(input[i]));
+        ss << "\\x" << setw(2) << static_cast<unsigned>(static_cast<unsigned char>(input[i]));
     }
     return ss.str();
 }
@@ -49,7 +49,7 @@ void free_enc(RSA* rsa, BIO* bio_p, char* encrypted_message){
         delete[] encrypted_message;
 }
 
-pair<std::string, std::string> generateRSAKeyPair() {
+pair<string, string> generateRSAKeyPair() {
     pair<string, string> keyPair;
     RSA *rsa = nullptr;
     BIGNUM *bne = nullptr;
@@ -66,7 +66,7 @@ pair<std::string, std::string> generateRSAKeyPair() {
 
     rsa = RSA_new();
     if (!RSA_generate_key_ex(rsa, bits, bne, nullptr)) {
-        std::cerr << "\nError generating RSA key: ";
+        cerr << "\nError generating RSA key: ";
         free_all(rsa,bne,bp_public, bp_private);
         return pair<string, string>("", "");
     }
@@ -75,7 +75,7 @@ pair<std::string, std::string> generateRSAKeyPair() {
     if (!PEM_write_bio_RSAPublicKey(bp_public, rsa)) {
         cerr << "\nError writing RSA public key; ";
         free_all(rsa,bne,bp_public, bp_private);
-        return std::pair<string, string>("", "");
+        return pair<string, string>("", "");
     }
 
     bp_private = BIO_new(BIO_s_mem());
@@ -127,7 +127,7 @@ string rsa_encrypt(string &plain, const string& public_key){
 
     cipher = string((char*)encrypted_message, enc_message_length);
     string file_name = "temp.bin";
-    ofstream output(file_name, std::ios::out | std::ios::app);
+    ofstream output(file_name, ios::out | ios::app);
     output << cipher;
     output.close();
 

@@ -70,4 +70,4 @@ def size_of_file(file_path):
 def print_server_info(ip, port, client_name, client_ip):
     print(f"\n\n      Server IP: {ip}     PORT: {port}", end = "\n\n")
     print(f"     Client's IP: {client_ip}   Client's name: {client_name}", end = "\n\n")
-    print("--------------------------------------------------")
+    print("----------------------------------------------------------------------")
