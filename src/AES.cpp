@@ -93,32 +93,8 @@ string aes_decrypt(const string& ciphertext, const string& key, const string& iv
     plaintext.resize(plaintext_len);
     return vectorToHexString(plaintext);
 }
-/*
-int main() {
-    vector<unsigned char> key(32); 
-    vector<unsigned char> iv(AES_BLOCK_SIZE);
 
-    if (!RAND_bytes(key.data(), key.size())) handleErrors();
-    if (!RAND_bytes(iv.data(), iv.size())) handleErrors();
 
-    string plaintext = "This is a secret message.";
-
-    vector<unsigned char> encrypted = aes_encrypt(plaintext, key, iv);
-    string key_hex = vectorToHexString(key);
-    string iv_hex = vectorToHexString(iv);
-    string encrypted_hex = vectorToHexString(encrypted);
-    cout << "Original: " << plaintext << endl;
-    cout << "Key (hex): " << key_hex << endl;
-    cout << "IV (hex): " << iv_hex << endl;
-    cout << "Encrypted (hex): " << encrypted_hex << endl;
-
-    vector<unsigned char> decrypted = aes_decrypt(encrypted, key, iv);
-
-    cout << "Decrypted: " << vectorToHexString(decrypted);
-
-    return 0;
-}
-*/
 PYBIND11_MODULE(aeslib, m){
     m.doc() = "AES functions";
 
