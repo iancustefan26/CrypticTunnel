@@ -72,7 +72,7 @@ string aes_encrypt(const string& plaintext, const string& key, const string& iv)
     return vectorToHexString(ciphertext);
 }
 
-string aes_decrypt(const vector<unsigned char>& ciphertext, const vector<unsigned char>& key, const vector<unsigned char>& iv) {
+string aes_decrypt(const string& ciphertext, const string& key, const string& iv) {
     EVP_CIPHER_CTX* ctx;
     vector<unsigned char> plaintext(ciphertext.size());
     int len;
@@ -80,9 +80,9 @@ string aes_decrypt(const vector<unsigned char>& ciphertext, const vector<unsigne
 
     if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
 
-    if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key.data(), iv.data())) handleErrors();
+    if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, hexStringToVector(key).data(), hexStringToVector(iv).data())) handleErrors();
 
-    if(1 != EVP_DecryptUpdate(ctx, plaintext.data(), &len, ciphertext.data(), ciphertext.size())) handleErrors();
+    if(1 != EVP_DecryptUpdate(ctx, plaintext.data(), &len, hexStringToVector(ciphertext).data(), hexStringToVector(ciphertext).size())) handleErrors();
     plaintext_len = len;
 
     if(1 != EVP_DecryptFinal_ex(ctx, plaintext.data() + len, &len)) handleErrors();

@@ -9,4 +9,7 @@ iv = ''.join(random.randbytes(16).hex())
 
 cipher = aeslib.aes_encrypt(plaintext, key, iv)
 
+decrypted = aeslib.aes_decrypt(cipher, key, iv)
+
 print(cipher)
+print(decrypted)
