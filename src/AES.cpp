@@ -28,6 +28,22 @@ string vectorToHexString(const vector<unsigned char>& vec) {
     return hex_str;
 }
 
+std::vector<unsigned char> hexStringToVector(const std::string& hex_str) {
+    if (hex_str.length() % 2 != 0) {
+        throw std::invalid_argument("Hex string must have an even number of characters");
+    }
+    std::vector<unsigned char> vec;
+    vec.reserve(hex_str.length() / 2);
+
+    for (size_t i = 0; i < hex_str.length(); i += 2) {
+        std::string byteString = hex_str.substr(i, 2);
+        unsigned char byte = static_cast<unsigned char>(std::stoi(byteString, nullptr, 16));
+        vec.push_back(byte);
+    }
+
+    return vec;
+}
+
 vector<unsigned char> aes_encrypt(const string& plaintext, const vector<unsigned char>& key, const vector<unsigned char>& iv) {
     EVP_CIPHER_CTX* ctx;
     vector<unsigned char> ciphertext(plaintext.size() + AES_BLOCK_SIZE);
