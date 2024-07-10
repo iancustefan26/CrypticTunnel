@@ -1,7 +1,12 @@
 import random
 import os
 import string
+import aeslib
 
-key = random.randbytes(32)
+plaintext = "Salut, sunt Stefan!"
+key = ''.join(random.choice(string.printable) for x in range (30)).encode().hex()
+iv = ''.join(random.randbytes(16).hex())
 
-print(key.hex())
+cipher = aeslib.aes_encrypt(plaintext, key, iv)
+
+print(cipher)

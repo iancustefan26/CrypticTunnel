@@ -59,6 +59,7 @@
         "unordered_set": "cpp",
         "valarray": "cpp",
         "vector": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "utility": "cpp"
     }
 }

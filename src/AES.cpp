@@ -6,8 +6,14 @@
 #include <vector>
 #include <cstring>
 #include <string>
+#include <pybind11/stl.h>
+#include <pybind11/pybind11.h>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
 using namespace std;
+namespace py = pybind11;
 
 void handleErrors() {
     cerr << "Error with AES operations";
@@ -37,14 +43,14 @@ std::vector<unsigned char> hexStringToVector(const std::string& hex_str) {
 
     for (size_t i = 0; i < hex_str.length(); i += 2) {
         std::string byteString = hex_str.substr(i, 2);
-        unsigned char byte = static_cast<unsigned char>(std::stoi(byteString, nullptr, 16));
+        unsigned char byte = static_cast<unsigned char>(stoi(byteString, nullptr, 16));
         vec.push_back(byte);
     }
 
     return vec;
 }
 
-vector<unsigned char> aes_encrypt(const string& plaintext, const vector<unsigned char>& key, const vector<unsigned char>& iv) {
+string aes_encrypt(const string& plaintext, const string& key, const string& iv) {
     EVP_CIPHER_CTX* ctx;
     vector<unsigned char> ciphertext(plaintext.size() + AES_BLOCK_SIZE);
     int len;
@@ -52,7 +58,7 @@ vector<unsigned char> aes_encrypt(const string& plaintext, const vector<unsigned
 
     if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
 
-    if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key.data(), iv.data())) handleErrors();
+    if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, hexStringToVector(key).data(), hexStringToVector(iv).data())) handleErrors();
 
     if(1 != EVP_EncryptUpdate(ctx, ciphertext.data(), &len, (unsigned char*)plaintext.data(), plaintext.size())) handleErrors();
     ciphertext_len = len;
@@ -63,10 +69,10 @@ vector<unsigned char> aes_encrypt(const string& plaintext, const vector<unsigned
     EVP_CIPHER_CTX_free(ctx);
 
     ciphertext.resize(ciphertext_len);
-    return ciphertext;
+    return vectorToHexString(ciphertext);
 }
 
-vector<unsigned char> aes_decrypt(const vector<unsigned char>& ciphertext, const vector<unsigned char>& key, const vector<unsigned char>& iv) {
+string aes_decrypt(const vector<unsigned char>& ciphertext, const vector<unsigned char>& key, const vector<unsigned char>& iv) {
     EVP_CIPHER_CTX* ctx;
     vector<unsigned char> plaintext(ciphertext.size());
     int len;
@@ -85,9 +91,9 @@ vector<unsigned char> aes_decrypt(const vector<unsigned char>& ciphertext, const
     EVP_CIPHER_CTX_free(ctx);
 
     plaintext.resize(plaintext_len);
-    return plaintext;
+    return vectorToHexString(plaintext);
 }
-
+/*
 int main() {
     vector<unsigned char> key(32); 
     vector<unsigned char> iv(AES_BLOCK_SIZE);
@@ -112,3 +118,13 @@ int main() {
 
     return 0;
 }
+*/
+PYBIND11_MODULE(aeslib, m){
+    m.doc() = "AES functions";
+
+    m.def("aes_encrypt", &aes_encrypt, "Funtion that encrypts a plaintext using a key AES256 (plain, key, iv)");
+    m.def("aes_decrypt", &aes_decrypt, "Funtion that decrypts a cipher using a key AES256 (cipher, key, iv)");
+
+}
+
+#pragma GCC diagnostic pop
