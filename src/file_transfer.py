@@ -1,14 +1,19 @@
 import os
 from usable import print_progress
 from usable import size_of_file
+import aeslib
 
-def send_file(file_path, client_sock):
+def send_file(file_path, client_sock, session_key = "", session_iv = ""):
     size, unit = size_of_file(file_path)
     progress_size = 0
     skip_loop = 0
     with open(file_path, "rb") as file:
         chunk = file.read(1024)
         while chunk:
+            if session_key != "":
+                hex_chunk = chunk.hex()
+                encrypted_chunk = aeslib.aes_encrypt(chunk.hex(), session_key.encode().hex(), session_iv).encode()
+                #print(encrypted_chunk)
             client_sock.sendall(chunk)
             skip_loop += 1
             if unit == "MB":
@@ -25,7 +30,7 @@ def send_file(file_path, client_sock):
     print(f"\n[+] File : {os.path.basename(file_path)} sent succesfully")
 
 
-def recive_file(file_name, client_sock):
+def recive_file(file_name, client_sock, session_key = "", session_iv = ""):
     if not os.path.exists(os.getcwd() + "/transfered"):
         os.makedirs(os.getcwd() + "/transfered")
     end_marker = b"END_OF_FILE_TRANSFER"

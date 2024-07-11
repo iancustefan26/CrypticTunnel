@@ -6,11 +6,19 @@ import os
 from file_transfer import send_file
 from usable import size_of_file
 from TLS_tunnel_init import *
+import aeslib
+
+session_iv = ""
+session_key = ""
+
 
 def init_TLS_tunnel(server_sock, name):
+    global session_key, session_iv
     client_hello(server_sock, name)
     session_key = client_key_exchange(server_sock)
-    print(f"Session key is : {session_key}")
+    session_iv = ''.join(random.randbytes(16).hex())
+    server_sock.sendall(session_iv.encode())
+    print(f"Session key is : {session_key}\nSession iv is : {session_iv}")
     os.remove("temp.bin")
     
 
@@ -50,7 +58,7 @@ def connect_to_server(server_addr, server_port, name):
                     response = client_sock.recv(1).decode('utf-8')
                     if response == 'y':
                         print("[+] File transfer accepted.")
-                        send_file(file_path, client_sock)
+                        send_file(file_path, client_sock, session_key, session_iv)
                     else:
                         print("[-] File transfer declined.")
 

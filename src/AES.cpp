@@ -35,6 +35,7 @@ string vectorToHexString(const vector<unsigned char>& vec) {
 }
 
 std::vector<unsigned char> hexStringToVector(const std::string& hex_str) {
+    //cout << "Hex string: " << hex_str << "\n";
     if (hex_str.length() % 2 != 0) {
         throw std::invalid_argument("Hex string must have an even number of characters");
     }
@@ -43,6 +44,7 @@ std::vector<unsigned char> hexStringToVector(const std::string& hex_str) {
 
     for (size_t i = 0; i < hex_str.length(); i += 2) {
         std::string byteString = hex_str.substr(i, 2);
+        // << byteString << " ";
         unsigned char byte = static_cast<unsigned char>(stoi(byteString, nullptr, 16));
         vec.push_back(byte);
     }

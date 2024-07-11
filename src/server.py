@@ -8,11 +8,15 @@ from TLS_tunnel_init import *
 import rsalib
 import os
 
+session_iv = ""
+session_key = ""
+
 def init_TLS_tunnel(client_sock):
     public_key, private_key = rsalib.generateRSAKeyPair()
     server_hello(client_sock, public_key)
     session_key = recive_key_exchange(client_sock, private_key)
-    print(f"Session key is : {session_key}")
+    session_iv = client_sock.recv(32).decode()
+    print(f"Session key is : {session_key}\nSession iv is : {session_iv}")
     os.remove("transfered/temp.bin")
 
 
@@ -38,7 +42,7 @@ def listen_client(client_sock, client_addr, name, client_ip):
                 client_sock.sendall(response.encode('utf-8'))
                 if response == "y":
                     print(f"[+] Reciveing file... : {file_name}")
-                    recive_file(file_name, client_sock)
+                    recive_file(file_name, client_sock, session_key, session_iv)
                 else:
                     print("[-] File transfer declined.\n")
                     continue
