@@ -10,13 +10,11 @@ def send_file(file_path, client_sock, session_key = "", session_iv = ""):
     with open(file_path, "rb") as file:
         chunk = file.read(1024)
         while chunk:
-            print(len(chunk))
             if session_key != "":
                 if len(chunk) < 1024:
                      chunk = chunk + bytes(1024 - len(chunk))
                 encrypted_chunk = aeslib.aes_encrypt(chunk.hex(), session_key.encode().hex(), session_iv).encode()
                 chunk = encrypted_chunk
-                print(encrypted_chunk)
             client_sock.sendall(chunk)
             skip_loop += 1
             if unit == "MB":
@@ -44,7 +42,6 @@ def recive_file(file_name, client_sock, session_key = "", session_iv = ""):
         os.makedirs(os.getcwd() + "/transfered")
     end_marker = b"END_OF_FILE_TRANSFER"
     buffer = b""
-    #print(f"HEY session kei : {session_key}")
     try:
         with open(os.getcwd() + "/transfered/" + file_name, "wb") as file:
                 while True:
@@ -52,11 +49,9 @@ def recive_file(file_name, client_sock, session_key = "", session_iv = ""):
                     if not chunk:
                         break
                     if session_key != "":
-                         print(chunk)
                          decrypted_chunk = bytes.fromhex(bytes.fromhex(aeslib.aes_decrypt(chunk.decode(), session_key.encode().hex(), session_iv)).decode('ascii')).decode('ascii').encode()
-                         print(decrypted_chunk)
                          chunk = decrypted_chunk
-                    buffer += chunk
+                    buffer += chunk.replace(b'\x00', b'')
                     if end_marker in buffer:
                         file.write(buffer.split(end_marker)[0])
                         break
