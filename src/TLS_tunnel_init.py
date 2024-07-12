@@ -1,5 +1,4 @@
-import os
-import socket
+
 import rsalib
 import random
 import string

@@ -2,7 +2,6 @@ import socket
 from usable import clear_screen
 from file_transfer import recive_file
 from usable import get_local_ip
-from usable import get_public_ip
 from usable import print_server_info
 from TLS_tunnel_init import *
 import rsalib
