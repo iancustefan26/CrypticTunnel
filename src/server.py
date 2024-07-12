@@ -12,6 +12,7 @@ session_iv = ""
 session_key = ""
 
 def init_TLS_tunnel(client_sock):
+    global session_key, session_iv
     public_key, private_key = rsalib.generateRSAKeyPair()
     server_hello(client_sock, public_key)
     session_key = recive_key_exchange(client_sock, private_key)

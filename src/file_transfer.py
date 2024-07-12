@@ -11,9 +11,9 @@ def send_file(file_path, client_sock, session_key = "", session_iv = ""):
         chunk = file.read(1024)
         while chunk:
             if session_key != "":
-                hex_chunk = chunk.hex()
                 encrypted_chunk = aeslib.aes_encrypt(chunk.hex(), session_key.encode().hex(), session_iv).encode()
-                #print(encrypted_chunk)
+                chunk = encrypted_chunk
+                print(encrypted_chunk)
             client_sock.sendall(chunk)
             skip_loop += 1
             if unit == "MB":
@@ -24,8 +24,11 @@ def send_file(file_path, client_sock, session_key = "", session_iv = ""):
                  print_progress(progress_size, size, unit)
                  skip_loop = 0
             chunk = file.read(1024)
-    end_marker = "END_OF_FILE_TRANSFER"
-    client_sock.sendall(end_marker.encode('utf-8'))
+    end_marker = b"END_OF_FILE_TRANSFER"
+    if session_key != "":      
+         client_sock.sendall(aeslib.aes_encrypt(end_marker.hex(), session_key.encode().hex(), session_iv).encode())
+    else:
+        client_sock.sendall(end_marker)
     print_progress(size, size, unit)
     print(f"\n[+] File : {os.path.basename(file_path)} sent succesfully")
 
@@ -35,13 +38,18 @@ def recive_file(file_name, client_sock, session_key = "", session_iv = ""):
         os.makedirs(os.getcwd() + "/transfered")
     end_marker = b"END_OF_FILE_TRANSFER"
     buffer = b""
-
+    #print(f"HEY session kei : {session_key}")
     try:
         with open(os.getcwd() + "/transfered/" + file_name, "wb") as file:
                 while True:
-                    chunk = client_sock.recv(1024)
+                    chunk = client_sock.recv(4128)
                     if not chunk:
                         break
+                    if session_key != "":
+                         print(chunk)
+                         decrypted_chunk = bytes.fromhex(bytes.fromhex(aeslib.aes_decrypt(chunk.decode(), session_key.encode().hex(), session_iv)).decode('ascii')).decode('ascii').encode()
+                         print(decrypted_chunk)
+                         chunk = decrypted_chunk
                     buffer += chunk
                     if end_marker in buffer:
                         file.write(buffer.split(end_marker)[0])

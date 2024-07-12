@@ -65,7 +65,8 @@ def connect_to_server(server_addr, server_port, name):
             else:
                 print(f"[!] {file_path} : No such file or directory.")
         try:
-            client_sock.sendall(client_message.encode('utf-8'))
+            if client_message[len(name) + 2 : len(name) + 7] != "/send":
+                client_sock.sendall(client_message.encode('utf-8'))
         except:
             print("[-] Host has disconnected; try /quit")
             dont = False

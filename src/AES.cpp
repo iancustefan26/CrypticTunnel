@@ -16,7 +16,7 @@ using namespace std;
 namespace py = pybind11;
 
 void handleErrors() {
-    cerr << "Error with AES operations";
+    cerr << "Error with AES operations\n";
     abort();
 }
 
