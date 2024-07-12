@@ -10,7 +10,10 @@ def send_file(file_path, client_sock, session_key = "", session_iv = ""):
     with open(file_path, "rb") as file:
         chunk = file.read(1024)
         while chunk:
+            print(len(chunk))
             if session_key != "":
+                if len(chunk) < 1024:
+                     chunk = chunk + bytes(1024 - len(chunk))
                 encrypted_chunk = aeslib.aes_encrypt(chunk.hex(), session_key.encode().hex(), session_iv).encode()
                 chunk = encrypted_chunk
                 print(encrypted_chunk)
@@ -25,7 +28,10 @@ def send_file(file_path, client_sock, session_key = "", session_iv = ""):
                  skip_loop = 0
             chunk = file.read(1024)
     end_marker = b"END_OF_FILE_TRANSFER"
-    if session_key != "":      
+    if session_key != "":
+         before_end_buf = bytes(1024)
+         encrypted_buf = aeslib.aes_encrypt(before_end_buf.hex(), session_key.encode().hex(), session_iv).encode()
+         client_sock.sendall(encrypted_buf)      
          client_sock.sendall(aeslib.aes_encrypt(end_marker.hex(), session_key.encode().hex(), session_iv).encode())
     else:
         client_sock.sendall(end_marker)
